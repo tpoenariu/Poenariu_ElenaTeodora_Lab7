@@ -15,6 +15,11 @@ public partial class ListPage : ContentPage
     {
         base.OnAppearing();
 
+        var items = await App.Database.GetShopsAsync();
+        ShopPicker.ItemsSource = (System.Collections.IList)items;
+        
+        ShopPicker.ItemDisplayBinding = new Binding("ShopDetails");
+
         var shopl = (ShopList)BindingContext;
         listView.ItemsSource = await App.Database.GetListProductsAsync(shopl.ID);
     }
@@ -22,6 +27,8 @@ public partial class ListPage : ContentPage
     async void OnSaveButtonClicked(object sender, EventArgs e)
     {
         var slist = (ShopList)BindingContext;
+        Shop selectedShop = (ShopPicker.SelectedItem as Shop);
+        slist.ShopID = selectedShop.ID;
         slist.Date = DateTime.UtcNow;
         await App.Database.SaveShopListAsync(slist);
         await Navigation.PopAsync();
